@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  email     String    @unique
+  password  String
+  pic       String    @default("https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg")
+  updatedAt DateTime  @updatedAt
+  createdAt DateTime  @default(now())
+
+  chat    Chat[]  @relation(name:"users",fields: [chatIds], references: [id])
+  chatIds String[] @db.ObjectId
+
+  chatGroupAdmin     Chat?  @relation(name:"groupAdmin")
+  
+  messageIds    Message[] @relation(name:"sender")
+  
+}
+
+model Chat {
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  chatName       String
+  description     String?
+  groupImage      String    @default("https://cdn-icons-png.flaticon.com/512/74/74577.png")
+  isGroupChat    Boolean   @default(false)
+
+  users  User[] @relation(name:"users",fields: [usersId], references: [id])
+  usersId String[]  @db.ObjectId
+
+  latestMessage Message?  @relation(name:"latestMessage",fields: [latestMessageId], references: [id] ,onDelete: NoAction , onUpdate: NoAction)
+  latestMessageId    String?  @db.ObjectId @unique
+
+  groupAdmin     User? @relation(name:"groupAdmin",fields: [groupAdminId], references: [id])
+  groupAdminId    String?  @db.ObjectId @unique
+
+  updatedAt      DateTime  @updatedAt
+  createdAt      DateTime  @default(now())
+
+  Messages    Message[]   @relation(name:"chatMessage")
+}
+
+model Message {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+
+  sender    User     @relation(name:"sender",fields: [senderId], references: [id])
+  senderId  String    @db.ObjectId 
+
+  content   String
+
+  chat      Chat @relation(name:"chatMessage",fields:[chatMessageId],references:[id])
+  chatMessageId    String   @db.ObjectId  
+
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  chatLatestMessage     Chat?   @relation(name:"latestMessage")
+}
