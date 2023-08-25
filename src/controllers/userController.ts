@@ -15,7 +15,7 @@ const UserClient = new PrismaClient().user;
 
 //register User
 export const registerUser = async (req: Request, res: Response) => {
-  const { name, email, password, pic } = req.body;
+  const { name, email, password, image } = req.body;
 
   if (!name || !email || !password) {
     return res.status(400).json({ error: "Please Enter all fields" });
@@ -41,7 +41,7 @@ export const registerUser = async (req: Request, res: Response) => {
         name,
         email,
         password: hashedPassword,
-        pic,
+        image,
       },
     });
 
@@ -71,18 +71,35 @@ export const loginUser = async (req: Request, res: Response) => {
     });
 
     if (user && (await passwordCompare(password, user.password))) {
-      return res.status(400).json({
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        images: user.pic,
-        token: generateJwtToken(user.id),
+      res.cookie("token", generateJwtToken(user.id), {
+        
+      });
+      return res.status(200).json({
+        // id: user.id,
+        // email: user.email,
+        // name: user.name,
+        // images: user.image,
+        accessToken: generateJwtToken(user.id),
       });
     } else {
       return res.status(400).json({ error: "User Not found" });
     }
   } else {
     return res.status(400).json({ error: "Please give only string value" });
+  }
+};
+
+//Logout User
+
+export const logoutUser = (req:Request,res: Response) => {
+  try {
+    res.status(200).cookie("token", "", {
+      httpOnly: true,
+      expires: new Date(0),
+    });
+    return res.json({ message: "Logout Successful" });
+  } catch (error) {
+    return res.status(400).json({ error: "User Not found" });
   }
 };
 
@@ -116,7 +133,7 @@ export const searchUser = async (req: Request, res: Response) => {
         id: true,
         name: true,
         email: true,
-        pic: true,
+        image: true,
       },
     });
 
@@ -140,7 +157,7 @@ export const userInfo = async (req: Request, res: Response) => {
         name: true,
         email: true,
         password: true,
-        pic: true,
+        image: true,
       },
     });
 

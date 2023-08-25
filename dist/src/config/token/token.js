@@ -22,8 +22,13 @@ const resetJwtToken = (id) => {
 exports.resetJwtToken = resetJwtToken;
 const verifyJwtToken = (token) => {
     if (secretKey !== undefined) {
-        const id = jsonwebtoken_1.default.verify(token, secretKey);
-        return id;
+        try {
+            const data = jsonwebtoken_1.default.verify(token, secretKey);
+            return data;
+        }
+        catch (error) {
+            return error;
+        }
     }
 };
 exports.verifyJwtToken = verifyJwtToken;

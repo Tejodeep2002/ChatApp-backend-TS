@@ -4,9 +4,9 @@ const express_1 = require("express");
 const userController_1 = require("../controllers/userController");
 const authMiddleware_1 = require("../middleware/authMiddleware");
 const router = (0, express_1.Router)();
-router.route("/").post(userController_1.registerUser).get(authMiddleware_1.authentication);
-router.route("/Login").post(userController_1.loginUser);
-// router.route("/userInfo").get(userInfo)
-// router.route("/forgetPassword").post(forgetPassword)
-// router.route("/resetLink").post(resetLink)
+router.route("/").post(userController_1.registerUser).get(authMiddleware_1.authentication, userController_1.searchUser);
+router.route("/login").post(userController_1.loginUser);
+router.route("/userInfo").get(authMiddleware_1.authentication, userController_1.userInfo);
+router.route("/forgetPassword").post(userController_1.forgetPassword);
+router.route("/resetLink").put(userController_1.resetLink);
 exports.default = router;

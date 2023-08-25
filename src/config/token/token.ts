@@ -4,7 +4,7 @@ const secretKey = process.env.JWT_SECRET;
 
 export const generateJwtToken = (id: string) => {
   if (secretKey !== undefined) {
-    const token = jwt.sign({ id }, secretKey, { expiresIn: "30d" });
+    const token = jwt.sign({ id }, secretKey, { expiresIn: "1h" });
     return token;
   }
 };

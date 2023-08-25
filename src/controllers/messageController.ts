@@ -29,7 +29,7 @@ export const sendNewMessage = async (req: Request, res: Response) => {
             select: {
               id: true,
               name: true,
-              pic: true,
+              image: true,
             },
           },
           content: true,
@@ -57,7 +57,7 @@ export const sendNewMessage = async (req: Request, res: Response) => {
               id: true,
               name: true,
               email: true,
-              pic: true,
+              image: true,
             },
           },
           groupAdmin: {
@@ -65,7 +65,7 @@ export const sendNewMessage = async (req: Request, res: Response) => {
               id: true,
               name: true,
               email: true,
-              pic: true,
+              image: true,
             },
           },
           latestMessage: {
@@ -112,7 +112,7 @@ export const fetchMessage = async (req: Request, res: Response) => {
             id: true,
             name: true,
             email: true,
-            pic: true,
+            image: true,
           },
         },
         content: true,
@@ -125,7 +125,7 @@ export const fetchMessage = async (req: Request, res: Response) => {
         updatedAt: true,
       },
     });
-    return res.status(400).json(allMessage);
+    return res.status(200).json(allMessage);
   } catch (error) {
     return res.status(400).json(error);
   }

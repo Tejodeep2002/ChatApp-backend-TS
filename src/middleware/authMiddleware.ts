@@ -9,7 +9,7 @@ declare global {
         id: string;
         name: string;
         email: string;
-        pic: string;
+        image: string;
       }; // Add your custom property and its type here
     }
   }
@@ -23,6 +23,7 @@ export const authentication = async (
   const secretKey = process.env.JWT_SECRET;
   let token;
   const UserClient = new PrismaClient().user;
+  
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith("Bearer")
@@ -44,7 +45,7 @@ export const authentication = async (
               id: true,
               name: true,
               email: true,
-              pic: true,
+              image: true,
             },
           });
 
@@ -57,13 +58,13 @@ export const authentication = async (
         next();
       }
     } catch (error) {
-      return res.status(400).json(error);
-      
+
+
+      return res.status(400).json({ error: "Token Error",token:token });
     }
   }
 
   if (!token) {
-    res.status(401);
-    throw new Error("Not authorized, no token");
+    return res.status(400).json({ error: "User not authorized" });
   }
 };
