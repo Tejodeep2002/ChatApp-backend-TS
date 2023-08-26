@@ -23,7 +23,7 @@ export const authentication = async (
   const secretKey = process.env.JWT_SECRET;
   let token;
   const UserClient = new PrismaClient().user;
-  
+
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith("Bearer")
@@ -52,15 +52,22 @@ export const authentication = async (
           if (user) {
             req.user = user;
           } else {
-            return res.status(400).json({ error: "User not authorized" });
+            res.status(400).cookie("token", "", {
+              httpOnly: true,
+              expires: new Date(0),
+            });
+            return res.json({ error: "User not authorized" });
           }
         }
         next();
       }
     } catch (error) {
+      res.status(400).cookie("token", "", {
+        httpOnly: true,
+        expires: new Date(0),
+      });
 
-
-      return res.status(400).json({ error: "Token Error",token:token });
+      return res.status(400).json({ error: "Token Error", token: token });
     }
   }
 

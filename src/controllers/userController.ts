@@ -71,9 +71,7 @@ export const loginUser = async (req: Request, res: Response) => {
     });
 
     if (user && (await passwordCompare(password, user.password))) {
-      res.cookie("token", generateJwtToken(user.id), {
-        
-      });
+      res.cookie("token", generateJwtToken(user.id), {});
       return res.status(200).json({
         // id: user.id,
         // email: user.email,
@@ -91,7 +89,7 @@ export const loginUser = async (req: Request, res: Response) => {
 
 //Logout User
 
-export const logoutUser = (req:Request,res: Response) => {
+export const logoutUser = (req: Request, res: Response) => {
   try {
     res.status(200).cookie("token", "", {
       httpOnly: true,

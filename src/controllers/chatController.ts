@@ -86,6 +86,7 @@ export const accessChat = async (req: Request, res: Response) => {
 
       return res.status(200).json(FullChat[0]);
     } catch (error) {
+      console.log("", error);
       return res
         .status(401)
         .json({ error: "Error Happens !! Chat not created" });
@@ -167,11 +168,7 @@ export const createGroup = async (req: Request, res: Response) => {
     return res.status(400).json({ error: "Please Fill all the fields" });
   }
 
-  if (
-    typeof name === "string" &&
-    typeof description === "string" &&
-    typeof groupImage === "string"
-  ) {
+  if (typeof name === "string" && typeof description === "string") {
     if (users.length < 1) {
       return res
         .status(400)
