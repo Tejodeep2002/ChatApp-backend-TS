@@ -72,13 +72,13 @@ export const loginUser = async (req: Request, res: Response) => {
 
     if (user && (await passwordCompare(password, user.password))) {
       res.cookie("token", generateJwtToken(user.id), {});
-      return res.status(200).json({
+      return res.status(200).json(
         // id: user.id,
         // email: user.email,
         // name: user.name,
         // images: user.image,
-        accessToken: generateJwtToken(user.id),
-      });
+        generateJwtToken(user.id),
+      );
     } else {
       return res.status(400).json({ error: "User Not found" });
     }
