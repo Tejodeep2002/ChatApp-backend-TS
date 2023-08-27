@@ -14,7 +14,6 @@ dotenv.config();
 app.use(express.json()); //to accept JSON data
 
 app.use(
-  "*",
   cors({
     origin: process.env.FRONTEND_URL,
     credentials: true,
