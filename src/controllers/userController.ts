@@ -11,7 +11,7 @@ import {
 import { Request, Response } from "express";
 import nodemailer from "nodemailer";
 
-const UserClient = new PrismaClient().user;
+const prisma = new PrismaClient();
 
 //register User
 export const registerUser = async (req: Request, res: Response) => {
@@ -25,7 +25,7 @@ export const registerUser = async (req: Request, res: Response) => {
     typeof email === "string" &&
     typeof password === "string"
   ) {
-    const userExist = await UserClient.findUnique({
+    const userExist = await prisma.user.findUnique({
       where: {
         email,
       },
@@ -36,7 +36,7 @@ export const registerUser = async (req: Request, res: Response) => {
     }
 
     const hashedPassword = await passwordHasher(password);
-    const user = await UserClient.create({
+    const user = await prisma.user.create({
       data: {
         name,
         email,
@@ -64,23 +64,23 @@ export const loginUser = async (req: Request, res: Response) => {
   }
 
   if (typeof email === "string" && typeof password === "string") {
-    const user = await UserClient.findUnique({
-      where: {
-        email,
-      },
-    });
+    try {
+      const user = await prisma.user.findUnique({
+        where: {
+          email,
+        },
+      });
 
-    if (user && (await passwordCompare(password, user.password))) {
-      res.cookie("token", generateJwtToken(user.id), {});
-      return res.status(200).json(
-        // id: user.id,
-        // email: user.email,
-        // name: user.name,
-        // images: user.image,
-        generateJwtToken(user.id),
-      );
-    } else {
-      return res.status(400).json({ error: "User Not found" });
+      if (user && (await passwordCompare(password, user.password))) {
+        res.cookie("token", generateJwtToken(user.id), {});
+        return res.status(200).json(generateJwtToken(user.id));
+      } else {
+        return res.status(400).json({ error: "User Not found" });
+      }
+    } catch (error) {
+      return res.status(400).json({ error });
+    } finally {
+      await prisma.$disconnect();
     }
   } else {
     return res.status(400).json({ error: "Please give only string value" });
@@ -110,7 +110,7 @@ export const searchUser = async (req: Request, res: Response) => {
   }
 
   try {
-    const users = await UserClient.findMany({
+    const users = await prisma.user.findMany({
       where: {
         OR: [
           {
@@ -146,7 +146,7 @@ export const searchUser = async (req: Request, res: Response) => {
 
 export const userInfo = async (req: Request, res: Response) => {
   try {
-    const user = await UserClient.findUnique({
+    const user = await prisma.user.findUnique({
       where: {
         id: req.user.id,
       },
@@ -175,7 +175,7 @@ export const forgetPassword = async (req: Request, res: Response) => {
   }
 
   if (typeof email === "string") {
-    const user = await UserClient.findUnique({
+    const user = await prisma.user.findUnique({
       where: {
         email,
       },
@@ -229,7 +229,7 @@ export const resetLink = async (req: Request, res: Response) => {
     const decoded: any = await verifyJwtToken(userId);
 
     try {
-      const user = await UserClient.update({
+      const user = await prisma.user.update({
         where: {
           id: decoded.id,
         },

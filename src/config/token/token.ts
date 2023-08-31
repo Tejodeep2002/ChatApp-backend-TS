@@ -1,19 +1,14 @@
 import jwt from "jsonwebtoken";
 
-const secretKey = process.env.JWT_SECRET;
+const secretKey = process.env.JWT_SECRET!;
+console.log(secretKey);
 
 export const generateJwtToken = (id: string) => {
-  if (secretKey !== undefined) {
-    const token = jwt.sign({ id }, secretKey, { expiresIn: "2h" });
-    return token;
-  }
+  return jwt.sign({ id }, secretKey, { expiresIn: "2h" });
 };
 
 export const resetJwtToken = (id: string) => {
-  if (secretKey !== undefined) {
-    const token = jwt.sign({ id }, secretKey, { expiresIn: 60 * 60 });
-    return token;
-  }
+  return jwt.sign({ id }, secretKey, { expiresIn: 60 * 60 });
 };
 
 export const verifyJwtToken = (token: string) => {

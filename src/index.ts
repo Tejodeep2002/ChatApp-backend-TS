@@ -66,6 +66,48 @@ io.on("connection", (socket) => {
     });
   });
 
+  //Call User
+  socket.on("call-user", ({ callTo, callFrom, selectedChatId, offer }) => {
+    console.log({ callTo, callFrom, selectedChatId, offer });
+    socket.join(`video-${selectedChatId}`);
+
+    console.log("Join user in video chat room", `video-${selectedChatId}`);
+
+    callTo.map((user: any) => {
+      console.log("incoming call", `${user.name}`);
+      socket
+        .to(user.id)
+        .emit("incoming-call", { callFrom, selectedChatId, offer });
+    });
+  });
+
+  socket.on("call-Accepted", (data) => {
+    const { callFrom, selectedChatId, answer } = data;
+    socket.join(`video-${selectedChatId}`);
+    console.log("Join user in video chat room", `video-${selectedChatId}`);
+    socket.to(callFrom.id).emit("call-Accepted", { callFrom, answer });
+  });
+
+  socket.on("call-Rejected", (callFrom) => {
+    console.log("call rejected", callFrom);
+    socket.to(callFrom).emit("call-Rejected", callFrom);
+  });
+
+  socket.on("negotiation-init", ({ callTo, callFrom, offer }) => {
+    console.log({ callTo, callFrom, offer });
+
+    // callTo.map((user: any) => {
+    //   socket.to(user.id).emit("negotiation-get", { callFrom, offer });
+    // });
+    socket.to(callTo.id).emit("negotiation-get", { callFrom, offer });
+  });
+  socket.on("negotiation-accepted", ({ callFrom, answer }) => {
+    console.log("Negotiation Accepted")
+    console.log(callFrom, answer);
+
+    socket.to(callFrom.id).emit("negotiation-accepted", { answer });
+  });
+
   socket.on("disconnect", () => {
     console.log("A user Disconnected");
   });

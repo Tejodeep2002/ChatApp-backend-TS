@@ -1,8 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 
-const messageClient = new PrismaClient().message;
-const chatClient = new PrismaClient().chat;
+const prisma = new PrismaClient();
 
 export const sendNewMessage = async (req: Request, res: Response) => {
   const { chatId, content } = req.body;
@@ -13,7 +12,7 @@ export const sendNewMessage = async (req: Request, res: Response) => {
 
   if (typeof chatId === "string" && typeof content === "string") {
     try {
-      const message = await messageClient.create({
+      const message = await prisma.message.create({
         data: {
           sender: {
             connect: { id: req.user.id },
@@ -21,6 +20,7 @@ export const sendNewMessage = async (req: Request, res: Response) => {
           content,
           chat: {
             connect: { id: chatId },
+            
           },
         },
         select: {
@@ -37,7 +37,8 @@ export const sendNewMessage = async (req: Request, res: Response) => {
           updatedAt: true,
         },
       });
-      const ChatUpdate = await chatClient.update({
+
+      const ChatUpdate = await prisma.chat.update({
         where: {
           id: chatId,
         },
@@ -83,6 +84,8 @@ export const sendNewMessage = async (req: Request, res: Response) => {
       return res.status(200).json(response);
     } catch (error) {
       return res.status(404).json({ error: "Message sent failed" });
+    } finally {
+      await prisma.$disconnect();
     }
   } else {
     return res.status(400).json({ error: "Please give only string value" });
@@ -97,7 +100,7 @@ export const fetchMessage = async (req: Request, res: Response) => {
   }
 
   try {
-    const allMessage = await messageClient.findMany({
+    const allMessage = await prisma.message.findMany({
       where: {
         chatMessageId: query,
       },
